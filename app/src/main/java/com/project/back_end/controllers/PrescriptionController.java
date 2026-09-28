@@ -1,17 +1,33 @@
 package com.project.back_end.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.project.back_end.models.Prescription;
+import com.project.back_end.services.PrescriptionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
+@RequestMapping("/prescriptions")
 public class PrescriptionController {
 
-    public boolean addPrescription(Object prescription) {
-        // Logic to create a new prescription
-        return true;
-    }
+    @Autowired
+    private PrescriptionService prescriptionService;
 
-    public List<Object> getPrescriptionsByPatientId(int patientId) {
-        // Logic to fetch prescriptions for a patient
-        return new ArrayList<>();
+    /**
+     * Endpoint to save a new prescription using POST.
+     * Accepts a Prescription object in the request body and returns a structured ResponseEntity.
+     */
+    @PostMapping
+    public ResponseEntity<?> addPrescription(@RequestBody Prescription prescription) {
+        if (prescription == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Prescription payload cannot be empty.");
+        }
+
+        Prescription savedPrescription = prescriptionService.savePrescription(prescription);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedPrescription);
     }
 }
