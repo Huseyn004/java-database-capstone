@@ -1,17 +1,21 @@
 package com.project.back_end.repo;
 
 import com.project.back_end.models.Patient;
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PatientRepository {
+import java.util.Optional;
 
-    Patient findById(int patientId);
+@Repository
+public interface PatientRepository extends JpaRepository<Patient, Long> {
 
-    List<Patient> findAll();
+    /**
+     * Retrieves a patient by their email address.
+     */
+    Optional<Patient> findByEmail(String email);
 
-    boolean save(Patient patient);
-
-    boolean update(Patient patient);
-
-    boolean deleteById(int patientId);
+    /**
+     * Retrieves a patient matching either their email address or phone number.
+     */
+    Optional<Patient> findByEmailOrPhone(String email, String phone);
 }
