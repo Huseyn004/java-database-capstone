@@ -1,23 +1,47 @@
 package com.project.back_end.services;
 
 import com.project.back_end.models.Appointment;
-import java.util.ArrayList;
+import com.project.back_end.repo.AppointmentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 
+@Service
 public class AppointmentService {
 
-    public List<Appointment> getDailyReportByDoctor(int doctorId, String date) {
-        // Business logic to retrieve daily appointment report for a specific doctor
-        return new ArrayList<>();
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    /**
+     * Books an appointment by interacting directly with the appointment repository.
+     */
+    public Appointment bookAppointment(Appointment appointment) {
+        if (appointment == null) {
+            throw new IllegalArgumentException("Appointment details cannot be null.");
+        }
+        return appointmentRepository.save(appointment);
     }
 
-    public boolean scheduleAppointment(Appointment appointment) {
-        // Business logic to validate and schedule a new appointment
-        return true;
+    /**
+     * Retrieves daily appointment report by filtering appointments for a specific doctor and date via repository.
+     */
+    public List<Appointment> getDailyReportByDoctor(Long doctorId, LocalDate date) {
+        return appointmentRepository.findByDoctorIdAndAppointmentTimeBetween(
+                doctorId,
+                date.atStartOfDay(),
+                date.atTime(23, 59, 59)
+        );
     }
 
-    public boolean updateAppointmentStatus(int appointmentId, String status) {
-        // Business logic to update appointment status
-        return true;
+    /**
+     * Updates status of an existing appointment.
+     */
+    public Appointment updateAppointmentStatus(Long appointmentId, String status) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found with ID: " + appointmentId));
+        appointment.setStatus(status);
+        return appointmentRepository.save(appointment);
     }
 }
